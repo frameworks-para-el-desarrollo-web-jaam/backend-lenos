@@ -9,9 +9,24 @@ export const authRequire = (req, res, next) => {
 
         jwt.verify(token, TOKEN_SECRET, (err, user) => {
             if(err) return res.status(403).json({message: 'Token is not valid'})
-            
          
             req.user = user;
             next();
-        })
+       })
+}
+
+export const authOptional = (req, res, next) => {
+    const { token } = req.cookies;
+
+    if (!token) {
+        return next();
+    }
+
+    jwt.verify(token, TOKEN_SECRET, (err, user) => {
+        if (!err) {
+            req.user = user;
+        }
+
+        next();
+    });
 }

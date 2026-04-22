@@ -1,5 +1,42 @@
 import mongoose from "mongoose";
 
+const pedidoEstados = ["Pendiente", "En proceso", "Completado"];
+
+const pedidoItemSchema = new mongoose.Schema(
+    {
+        productId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Producto",
+            required: false,
+        },
+        nombreProducto: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        precioUnitario: {
+            type: Number,
+            required: true,
+            min: 0,
+        },
+        cantidad: {
+            type: Number,
+            required: true,
+            min: 1,
+        },
+        subtotal: {
+            type: Number,
+            required: true,
+            min: 0,
+        },
+        imagen: {
+            type: String,
+            trim: true,
+        },
+    },
+    { _id: false }
+);
+
 const pedidoSchema = new mongoose.Schema({
     nombre: {
         type: String,
@@ -9,11 +46,14 @@ const pedidoSchema = new mongoose.Schema({
     telefono: { 
         type: String, 
         required: true, 
-        length: 10 
+        trim: true,
+        minlength: 7,
+        maxlength: 20,
     },
     direccion: {
         type: String, 
-        required: true 
+        required: true,
+        trim: true,
     },
     fecha_solicitud: {
         type: Date,
@@ -22,22 +62,42 @@ const pedidoSchema = new mongoose.Schema({
     },
     fecha_envio: {
         type: Date,
-        default : Date.now,
         required: false 
+    },
+    items: {
+        type: [pedidoItemSchema],
+        required: true,
+        validate: {
+            validator: (items) => Array.isArray(items) && items.length > 0,
+            message: "El pedido debe incluir al menos un producto",
+        },
+    },
+    cantidadProductos: {
+        type: Number,
+        required: true,
+        min: 1,
     },
     total: { 
         type: Number,
-        default: 0.0 
+        required: true,
+        min: 0,
     },
     pagado: [String],
+    estado: {
+        type: String,
+        default: "Pendiente",
+        trim: true,
+        enum: pedidoEstados,
+    },
 
     comentario: { 
-        type: String 
+        type: String,
+        trim: true,
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true
+        required: false
     }
 }, { timestamps: true })
 

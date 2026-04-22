@@ -1,10 +1,12 @@
 import mongoose from "mongoose";
 
 export const connectDB = async () => {
-    try{
-        await mongoose.connect('mongodb://localhost/ventalenos');
-        console.log("db connected")
-    }catch (error){
-        console.log(error);
-    }
+  const mongoUri = process.env.MONGO_URI || "mongodb://localhost:27017/ventalenos";
+
+  try {
+    await mongoose.connect(mongoUri);
+    console.log("db connected");
+  } catch (error) {
+    console.log(error);
+  }
 };
